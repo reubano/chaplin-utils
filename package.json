@@ -17,7 +17,6 @@
     "node": "0.10.32"
   },
   "scripts": {
-    "start": "brunch watch --server",
     "postinstall": "bower install && brunch build -P"
   },
   "devDependencies": {
