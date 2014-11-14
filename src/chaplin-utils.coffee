@@ -10,11 +10,8 @@ module.exports = class ChapinUtils
 
     # optional
     @ua = options?.ua
-    @subdomain = options?.subdomain
     @log_interval = options?.log_interval ? 5000
     @google = options?.google
-    @analytics = @google?.analytics
-    @google_analytics_id = "#{@analytics?.id}-#{@analytics?.site_number}"
 
   JQUERY_EVENTS: """
     blur focus focusin focusout load resize scroll unload click dblclick
@@ -30,6 +27,9 @@ module.exports = class ChapinUtils
         interval: @log_interval
 
     @logger = Minilog @site.id
+    @analytics = @google?.analytics
+    @subdomain = @site?.subdomain
+    @google_analytics_id = "#{@analytics?.id}-#{@analytics?.site_number}"
 
   toggleOrderby: ->
     mediator.setOrderby if mediator.orderby is 'asc' then 'desc' else 'asc'
