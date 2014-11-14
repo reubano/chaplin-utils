@@ -1,7 +1,7 @@
 mediator = Chaplin.mediator
 
 module.exports = class Utils
-  constructor: (options) =>
+  constructor: (options) ->
     # required
     @site = options.site
     @enable = options.enable
