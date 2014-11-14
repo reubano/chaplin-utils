@@ -5,10 +5,7 @@
     "Reuben Cummings <reubano@gmail.com>"
   ],
   "description": "Useful utilities for chaplinjs apps",
-  "main": "chaplin-utils.js",
-  "moduleType": [
-    "amd"
-  ],
+  "main": "dist/chaplin-utils.js",
   "dependencies": {
     "chaplin": "~1.0.0",
     "minilog": "~2.0.6",

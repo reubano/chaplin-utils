@@ -1,0 +1,30 @@
+{
+  "author": "Reuben Cummings",
+  "name": "chaplin-utils",
+  "description": "Useful utilities for chaplinjs apps",
+  "version": "0.6.0",
+  "environment": "web",
+  "homepage": "https://github.com/reubano/chaplin-utils",
+  "keywords": [
+    "chaplinjs",
+    "utilities"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/reubano/chaplin-utils"
+  },
+  "engines": {
+    "node": "0.10.32"
+  },
+  "scripts": {
+    "postinstall": "bower install && brunch build -P"
+  },
+  "devDependencies": {
+    "bower": "^1.3.12",
+    "brunch": "1.7",
+    "coffee-script": "^1.8.0",
+    "coffee-script-brunch": ">= 1.0 < 1.8",
+    "coffeelint-brunch": ">= 1.0 < 1.8",
+    "uglify-js-brunch": ">= 1.0 < 1.8"
+  }
+}
