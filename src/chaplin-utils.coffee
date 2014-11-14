@@ -9,6 +9,7 @@ module.exports = class ChapinUtils
     @urls = options.urls
 
     # optional
+    @localhost = options?.localhost
     @ua = options?.ua
     @log_interval = options?.log_interval ? 5000
     @google = options?.google
@@ -30,6 +31,20 @@ module.exports = class ChapinUtils
     @analytics = @google?.analytics
     @subdomain = @site?.subdomain
     @google_analytics_id = "#{@analytics?.id}-#{@analytics?.site_number}"
+
+  initGA: =>
+    if @localhost
+      cookie_domain = {cookieDomain: 'none'}
+    else
+      cookie_domain = 'auto'
+
+    ga 'create', @google_analytics_id, cookie_domain
+    ga 'require', 'displayfeatures'
+
+  changeURL: (url) -> Backbone.history.navigate url, trigger: false
+
+  smoothScroll: (postion) ->
+    $('html, body').animate scrollTop: postion, devconfig.scroll_time, 'linear'
 
   toggleOrderby: ->
     mediator.setOrderby if mediator.orderby is 'asc' then 'desc' else 'asc'
