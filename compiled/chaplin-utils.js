@@ -91,13 +91,11 @@
   globals.require.brunch = true;
 })();
 require.register("src/chaplin-utils", function(exports, require, module) {
-var ChapinUtils, exports, mediator, root,
+var ChapinUtils, exports, mediator,
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
   __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
 mediator = Chaplin.mediator;
-
-root = this;
 
 ChapinUtils = (function() {
   function ChapinUtils(options) {
@@ -354,18 +352,19 @@ ChapinUtils = (function() {
 
 })();
 
-if ((typeof exports !== "undefined" && exports !== null) && (typeof module !== "undefined" && module !== null ? module.exports : void 0)) {
+if (typeof module !== "undefined" && module !== null ? module.exports : void 0) {
   exports = module.exports = ChapinUtils;
 } else if (exports != null) {
   exports.ChapinUtils = ChapinUtils;
-} else if (typeof define === 'function' && define.amd) {
-  define(function() {
+} else if ((typeof define !== "undefined" && define !== null ? define.amd : void 0) != null) {
+  define([], function() {
     return ChapinUtils;
   });
-} else if (typeof window === 'object') {
+  this.ChapinUtils = ChapinUtils;
+} else if ((typeof window !== "undefined" && window !== null) || (typeof require !== "undefined" && require !== null)) {
   window.ChapinUtils = ChapinUtils;
 } else {
-  root.ChapinUtils = ChapinUtils;
+  this.ChapinUtils = ChapinUtils;
 }
 });
 
