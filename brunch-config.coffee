@@ -14,5 +14,5 @@ exports.config =
         'chaplin-utils.js': /^src/
 
   paths:
-    public: './dist'
+    public: './compiled'
     watched: ['src']

@@ -2,7 +2,7 @@
   "author": "Reuben Cummings",
   "name": "chaplin-utils",
   "description": "Useful utilities for chaplinjs apps",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "environment": "web",
   "homepage": "https://github.com/reubano/chaplin-utils",
   "keywords": [
