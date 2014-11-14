@@ -81,7 +81,7 @@ module.exports = class ChapinUtils
       when 'social' then 10
       else 0
 
-  log: (message, level='debug', options=null) ->
+  log: (message, level='debug', options=null) =>
     priority = @_getPriority level
     options = options ? {}
 
