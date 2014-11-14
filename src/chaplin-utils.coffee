@@ -1,6 +1,6 @@
 mediator = Chaplin.mediator
 
-module.exports = class Utils
+module.exports = class ChapinUtils
   constructor: (options) ->
     # required
     @site = options.site
@@ -9,12 +9,10 @@ module.exports = class Utils
     @urls = options.urls
 
     # optional
+    @localhost = options?.localhost
     @ua = options?.ua
-    @subdomain = options?.subdomain
     @log_interval = options?.log_interval ? 5000
     @google = options?.google
-    @analytics = @google?.analytics
-    @google_analytics_id = "#{@analytics?.id}-#{@analytics?.site_number}"
 
   JQUERY_EVENTS: """
     blur focus focusin focusout load resize scroll unload click dblclick
@@ -30,6 +28,23 @@ module.exports = class Utils
         interval: @log_interval
 
     @logger = Minilog @site.id
+    @analytics = @google?.analytics
+    @subdomain = @site?.subdomain
+    @google_analytics_id = "#{@analytics?.id}-#{@analytics?.site_number}"
+
+  initGA: =>
+    if @localhost
+      cookie_domain = {cookieDomain: 'none'}
+    else
+      cookie_domain = 'auto'
+
+    ga 'create', @google_analytics_id, cookie_domain
+    ga 'require', 'displayfeatures'
+
+  changeURL: (url) -> Backbone.history.navigate url, trigger: false
+
+  smoothScroll: (postion) ->
+    $('html, body').animate scrollTop: postion, devconfig.scroll_time, 'linear'
 
   toggleOrderby: ->
     mediator.setOrderby if mediator.orderby is 'asc' then 'desc' else 'asc'
@@ -81,7 +96,7 @@ module.exports = class Utils
       when 'social' then 10
       else 0
 
-  log: (message, level='debug', options=null) ->
+  log: (message, level='debug', options=null) =>
     priority = @_getPriority level
     options = options ? {}
 
@@ -101,7 +116,6 @@ module.exports = class Utils
       console.log "#{level} for #{message}"
     else if log_local
       console.log message
-
 
     if log_remote or track
       user_options =
