@@ -1,5 +1,4 @@
 mediator = Chaplin.mediator
-root = this
 
 class ChapinUtils
   constructor: (options) ->
@@ -197,16 +196,18 @@ class ChapinUtils
         data = _.extend options, user_options, hit_options
         $.post @urls.tracker, data
 
-if exports? and module?.exports
+if module?.exports
+  # Commonjs
   exports = module.exports = ChapinUtils
 else if exports?
   # Node.js
   exports.ChapinUtils = ChapinUtils
-else if (typeof define is 'function' && define.amd)
+else if define?.amd?
   # Requirejs
-  define(-> ChapinUtils)
-else if (typeof window is 'object')
+  define [], -> ChapinUtils
+  @ChapinUtils = ChapinUtils
+else if window? or require?
   # Browser
   window.ChapinUtils = ChapinUtils
 else
-  root.ChapinUtils = ChapinUtils
+  @ChapinUtils = ChapinUtils
