@@ -200,6 +200,13 @@ class ChapinUtils
 if exports? and module?.exports
   exports = module.exports = ChapinUtils
 else if exports?
+  # Node.js
   exports.ChapinUtils = ChapinUtils
+else if (typeof define is 'function' && define.amd)
+  # Requirejs
+  define(-> ChapinUtils)
+else if (typeof window is 'object')
+  # Browser
+  window.ChapinUtils = ChapinUtils
 else
   root.ChapinUtils = ChapinUtils

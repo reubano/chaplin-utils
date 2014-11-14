@@ -358,6 +358,12 @@ if ((typeof exports !== "undefined" && exports !== null) && (typeof module !== "
   exports = module.exports = ChapinUtils;
 } else if (exports != null) {
   exports.ChapinUtils = ChapinUtils;
+} else if (typeof define === 'function' && define.amd) {
+  define(function() {
+    return ChapinUtils;
+  });
+} else if (typeof window === 'object') {
+  window.ChapinUtils = ChapinUtils;
 } else {
   root.ChapinUtils = ChapinUtils;
 }
