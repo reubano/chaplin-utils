@@ -117,7 +117,6 @@ module.exports = class ChapinUtils
     else if log_local
       console.log message
 
-
     if log_remote or track
       user_options =
         time: (new Date()).getTime()
