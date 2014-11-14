@@ -1,6 +1,7 @@
 mediator = Chaplin.mediator
+root = this
 
-module.exports = class ChapinUtils
+class ChapinUtils
   constructor: (options) ->
     # required
     @site = options.site
@@ -195,3 +196,10 @@ module.exports = class ChapinUtils
 
         data = _.extend options, user_options, hit_options
         $.post @urls.tracker, data
+
+if exports? and module?.exports
+  exports = module.exports = ChapinUtils
+else if exports?
+  exports.ChapinUtils = ChapinUtils
+else
+  root.ChapinUtils = ChapinUtils

@@ -91,13 +91,15 @@
   globals.require.brunch = true;
 })();
 require.register("src/chaplin-utils", function(exports, require, module) {
-var ChapinUtils, mediator,
+var ChapinUtils, exports, mediator, root,
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
   __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
 mediator = Chaplin.mediator;
 
-module.exports = ChapinUtils = (function() {
+root = this;
+
+ChapinUtils = (function() {
   function ChapinUtils(options) {
     this.log = __bind(this.log, this);
     this.initGA = __bind(this.initGA, this);
@@ -351,6 +353,14 @@ module.exports = ChapinUtils = (function() {
   return ChapinUtils;
 
 })();
+
+if ((typeof exports !== "undefined" && exports !== null) && (typeof module !== "undefined" && module !== null ? module.exports : void 0)) {
+  exports = module.exports = ChapinUtils;
+} else if (exports != null) {
+  exports.ChapinUtils = ChapinUtils;
+} else {
+  root.ChapinUtils = ChapinUtils;
+}
 });
 
 ;
