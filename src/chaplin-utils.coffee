@@ -134,7 +134,7 @@ class ChapinUtils
       url = if @subdomain? then "/#{@subdomain}" else ''
       url += mediator.url
 
-      ga (tracker) ->
+      ga (tracker) =>
         hit_options =
           v: 1
           tid: @google_analytics_id
