@@ -149,7 +149,8 @@
     };
 
     ChapinUtils.prototype.log = function(message, level, options) {
-      var data, local_enabled, local_priority, log_local, log_remote, priority, remote_enabled, remote_priority, text, track, tracker_priority, tracking_enabled, url, user_options, _ref, _ref1;
+      var data, local_enabled, local_priority, log_local, log_remote, priority, remote_enabled, remote_priority, text, track, tracker_priority, tracking_enabled, url, user_options, _ref, _ref1,
+        _this = this;
 
       if (level == null) {
         level = 'debug';
@@ -158,6 +159,8 @@
         options = null;
       }
       priority = this._getPriority(level);
+      url = this.subdomain != null ? "/" + this.subdomain : '';
+      url += mediator.url;
       options = options != null ? options : {};
       local_enabled = this.enable.logger.local;
       remote_enabled = this.enable.logger.remote;
@@ -169,7 +172,7 @@
       log_remote = remote_enabled && remote_priority;
       track = tracking_enabled && tracker_priority;
       if (log_local && priority >= this.verbosity.tracker) {
-        console.log("" + level + " for " + message);
+        console.log("" + level + " for " + url);
       } else if (log_local) {
         console.log(message);
       }
@@ -188,26 +191,24 @@
         this.logger[level](data);
       }
       if (track) {
-        url = this.subdomain != null ? "/" + this.subdomain : '';
-        url += mediator.url;
         return ga(function(tracker) {
           var hit_options, _ref10, _ref11, _ref12, _ref13, _ref14, _ref15, _ref16, _ref17, _ref18, _ref19, _ref2, _ref3, _ref4, _ref5, _ref6, _ref7, _ref8, _ref9;
 
           hit_options = {
             v: 1,
-            tid: this.google_analytics_id,
+            tid: _this.google_analytics_id,
             cid: tracker.get('clientId'),
             uid: mediator != null ? (_ref2 = mediator.user) != null ? _ref2.get('id') : void 0 : void 0,
             dr: document.referrer || 'direct',
-            ua: this.ua,
-            gclid: (_ref3 = this.google) != null ? _ref3.adwords_id : void 0,
-            dclid: (_ref4 = this.google) != null ? _ref4.displayads_id : void 0,
+            ua: _this.ua,
+            gclid: (_ref3 = _this.google) != null ? _ref3.adwords_id : void 0,
+            dclid: (_ref4 = _this.google) != null ? _ref4.displayads_id : void 0,
             sr: "" + screen.width + "x" + screen.height,
             vp: "" + ($(window).width()) + "x" + ($(window).height()),
             t: level,
-            an: this.site.title,
-            aid: this.site.id,
-            av: this.site.version,
+            an: _this.site.title,
+            aid: _this.site.id,
+            av: _this.site.version,
             dp: url,
             dh: document.location.hostname,
             dt: message
@@ -256,7 +257,7 @@
             });
           }
           data = _.extend(options, user_options, hit_options);
-          return $.post(this.urls.tracker, data);
+          return $.post(_this.urls.tracker, data);
         });
       }
     };
