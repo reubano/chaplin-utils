@@ -100,6 +100,8 @@ class ChapinUtils
 
   log: (message, level='debug', options=null) =>
     priority = @_getPriority level
+    url = if @subdomain? then "/#{@subdomain}" else ''
+    url += mediator.url
     options = options ? {}
 
     local_enabled = @enable.logger.local
@@ -115,7 +117,7 @@ class ChapinUtils
     track = tracking_enabled and tracker_priority
 
     if log_local and priority >= @verbosity.tracker
-      console.log "#{level} for #{message}"
+      console.log "#{level} for #{url}"
     else if log_local
       console.log message
 
@@ -131,12 +133,7 @@ class ChapinUtils
       @logger[level] data
 
     if track
-      if @subdomain?
-        url = "/#{config.subdomain}#{mediator.url}"
-      else
-        url = mediator.url
-
-      ga (tracker) ->
+      ga (tracker) =>
         hit_options =
           v: 1
           tid: @google_analytics_id
