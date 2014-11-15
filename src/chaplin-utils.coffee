@@ -131,10 +131,8 @@ class ChapinUtils
       @logger[level] data
 
     if track
-      if @subdomain?
-        url = "/#{config.subdomain}#{mediator.url}"
-      else
-        url = mediator.url
+      url = if @subdomain? then "/#{@subdomain}" else ''
+      url += mediator.url
 
       ga (tracker) ->
         hit_options =
