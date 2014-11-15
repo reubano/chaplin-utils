@@ -9,9 +9,9 @@ class ChapinUtils
     @urls = options.urls
 
     # optional
+    @time = options?.time
     @localhost = options?.localhost
     @ua = options?.ua
-    @log_interval = options?.log_interval ? 5000
     @google = options?.google
 
   JQUERY_EVENTS: """
@@ -28,6 +28,8 @@ class ChapinUtils
         interval: @log_interval
 
     @logger = Minilog @site.id
+    @log_interval = @time?.logger ? 5000
+    @scroll_time = @time?.scroll ? 750
     @analytics = @google?.analytics
     @subdomain = @site?.subdomain
     @google_analytics_id = "#{@analytics?.id}-#{@analytics?.site_number}"
@@ -43,8 +45,8 @@ class ChapinUtils
 
   changeURL: (url) -> Backbone.history.navigate url, trigger: false
 
-  smoothScroll: (postion) ->
-    $('html, body').animate scrollTop: postion, devconfig.scroll_time, 'linear'
+  smoothScroll: (postion) =>
+    $('html, body').animate scrollTop: postion, @scroll_time, 'linear'
 
   toggleOrderby: ->
     mediator.setOrderby if mediator.orderby is 'asc' then 'desc' else 'asc'
@@ -129,7 +131,7 @@ class ChapinUtils
       @logger[level] data
 
     if track
-      if config?.subdomain?
+      if @subdomain?
         url = "/#{config.subdomain}#{mediator.url}"
       else
         url = mediator.url

@@ -9,33 +9,33 @@
   ChapinUtils = (function() {
     function ChapinUtils(options) {
       this.log = __bind(this.log, this);
+      this.smoothScroll = __bind(this.smoothScroll, this);
       this.initGA = __bind(this.initGA, this);
-      this.init = __bind(this.init, this);
-      var _ref;
-
-      this.site = options.site;
+      this.init = __bind(this.init, this);      this.site = options.site;
       this.enable = options.enable;
       this.verbosity = options.verbosity;
       this.urls = options.urls;
+      this.time = options != null ? options.time : void 0;
       this.localhost = options != null ? options.localhost : void 0;
       this.ua = options != null ? options.ua : void 0;
-      this.log_interval = (_ref = options != null ? options.log_interval : void 0) != null ? _ref : 5000;
       this.google = options != null ? options.google : void 0;
     }
 
     ChapinUtils.prototype.JQUERY_EVENTS = "blur focus focusin focusout load resize scroll unload click dblclick\nmousedown mouseup  mousemove mouseover mouseout mouseenter mouseleave\nchange select submit keydown keypress keyup error";
 
     ChapinUtils.prototype.init = function() {
-      var _ref, _ref1, _ref2, _ref3;
+      var _ref, _ref1, _ref2, _ref3, _ref4, _ref5, _ref6, _ref7;
 
       Minilog.enable().pipe(new Minilog.backends.jQuery({
         url: this.urls.logger,
         interval: this.log_interval
       }));
       this.logger = Minilog(this.site.id);
-      this.analytics = (_ref = this.google) != null ? _ref.analytics : void 0;
-      this.subdomain = (_ref1 = this.site) != null ? _ref1.subdomain : void 0;
-      return this.google_analytics_id = "" + ((_ref2 = this.analytics) != null ? _ref2.id : void 0) + "-" + ((_ref3 = this.analytics) != null ? _ref3.site_number : void 0);
+      this.log_interval = (_ref = (_ref1 = this.time) != null ? _ref1.logger : void 0) != null ? _ref : 5000;
+      this.scroll_time = (_ref2 = (_ref3 = this.time) != null ? _ref3.scroll : void 0) != null ? _ref2 : 750;
+      this.analytics = (_ref4 = this.google) != null ? _ref4.analytics : void 0;
+      this.subdomain = (_ref5 = this.site) != null ? _ref5.subdomain : void 0;
+      return this.google_analytics_id = "" + ((_ref6 = this.analytics) != null ? _ref6.id : void 0) + "-" + ((_ref7 = this.analytics) != null ? _ref7.site_number : void 0);
     };
 
     ChapinUtils.prototype.initGA = function() {
@@ -61,7 +61,7 @@
     ChapinUtils.prototype.smoothScroll = function(postion) {
       return $('html, body').animate({
         scrollTop: postion
-      }, devconfig.scroll_time, 'linear');
+      }, this.scroll_time, 'linear');
     };
 
     ChapinUtils.prototype.toggleOrderby = function() {
@@ -188,7 +188,7 @@
         this.logger[level](data);
       }
       if (track) {
-        if ((typeof config !== "undefined" && config !== null ? config.subdomain : void 0) != null) {
+        if (this.subdomain != null) {
           url = "/" + config.subdomain + mediator.url;
         } else {
           url = mediator.url;
