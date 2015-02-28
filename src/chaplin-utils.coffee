@@ -1,8 +1,7 @@
-mediator = Chaplin.mediator
-
 class ChapinUtils
   constructor: (options) ->
     # required
+    @mediator = options.mediator
     @site = options.site
     @enable = options.enable
     @verbosity = options.verbosity
@@ -31,7 +30,6 @@ class ChapinUtils
     @log_interval = @time?.logger ? 5000
     @scroll_time = @time?.scroll ? 750
     @analytics = @google?.analytics
-    @subdomain = @site?.subdomain
     @google_analytics_id = "#{@analytics?.id}-#{@analytics?.site_number}"
 
   initGA: =>
@@ -48,8 +46,8 @@ class ChapinUtils
   smoothScroll: (postion) =>
     $('html, body').animate scrollTop: postion, @scroll_time, 'linear'
 
-  toggleOrderby: ->
-    mediator.setOrderby if mediator.orderby is 'asc' then 'desc' else 'asc'
+  toggleOrderby: =>
+    @mediator.setOrderby if @mediator.orderby is 'asc' then 'desc' else 'asc'
 
   filterFeed: (feed, page) ->
     if page?.filterby?.key and page?.filterby?.value
@@ -74,9 +72,9 @@ class ChapinUtils
 
       filter1 and filter2
 
-  makeComparator: (sortby=null, orderby=null) ->
-    sortby = sortby ? mediator.sortby
-    orderby = orderby ? mediator.orderby
+  makeComparator: (sortby=null, orderby=null) =>
+    sortby = sortby ? @mediator.sortby
+    orderby = orderby ? @mediator.orderby
     (model) -> (if orderby is 'asc' then 1 else -1) * model.get sortby
 
   getTags: (collection) ->
@@ -100,8 +98,7 @@ class ChapinUtils
 
   log: (message, level='debug', options=null) =>
     priority = @_getPriority level
-    url = if @subdomain? then "/#{@subdomain}" else ''
-    url += mediator.url
+    url = @mediator.url
     options = options ? {}
 
     local_enabled = @enable.logger.local
@@ -124,7 +121,7 @@ class ChapinUtils
     if log_remote or track
       user_options =
         time: (new Date()).getTime()
-        user: mediator?.user?.get('email')
+        user: @mediator?.user?.get('email') ? @mediator?.user?.email
 
     if log_remote
       text = JSON.stringify message
@@ -138,7 +135,7 @@ class ChapinUtils
           v: 1
           tid: @google_analytics_id
           cid: tracker.get 'clientId'
-          uid: mediator?.user?.get('id')
+          uid: @mediator?.user?.get('id') ? @mediator?.user?.id
           # uip: ip address
           dr: document.referrer or 'direct'
           ua: @ua
@@ -185,7 +182,7 @@ class ChapinUtils
             hit_options = _.extend hit_options,
               sn: options?.network ? 'facebook'
               sa: options?.action ? 'like'
-              st: options?.target ? mediator.url
+              st: options?.target ? url
 
         if level is 'experiment'
           hit_options = _.extend hit_options,
