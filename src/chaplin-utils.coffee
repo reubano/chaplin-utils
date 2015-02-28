@@ -149,7 +149,7 @@ class ChapinUtils
     if log_remote
       text = JSON.stringify message
       message = if text.length > 512 then "size exceeded" else message
-      data = _.extend {message: message}, user_options
+      data = _.extend {message}, user_options
       @logger[level] data
 
     if track
