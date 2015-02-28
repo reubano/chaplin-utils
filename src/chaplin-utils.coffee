@@ -77,8 +77,25 @@ class ChapinUtils
     orderby = orderby ? @mediator.orderby
     (model) -> (if orderby is 'asc' then 1 else -1) * model.get sortby
 
-  getTags: (collection) ->
-    _.uniq(_.flatten collection.pluck 'k:tags').sort()
+  getTags: (collection, options=null) ->
+    options = options ? {}
+    attr = options?.attr ? 'k:tags'
+    sortby = options?.sortby ? 'count'
+    n = options?.n
+
+    all = _.flatten collection.pluck attr
+    # ['a', 'c', 'b', 'b', 'b', 'c']
+    counted = _.countBy all, (name) -> name
+    # {a: 1, c: 2, b: 3}
+    collected = ({name: name, count: count} for name, count of counted)
+    # [{name: 'a', count: 1}, {name: 'b', count: 3}, {name: 'c', count: 2}]
+    sorted = _.sortBy collected, 'name'
+
+    if sortby is 'count'
+      sorted = _.sortBy sorted, (name) -> - name.count
+
+    if n
+      _.first sorted, n
 
   # Logging helper
   # ---------------------
