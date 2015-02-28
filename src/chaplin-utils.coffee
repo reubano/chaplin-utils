@@ -97,6 +97,12 @@ class ChapinUtils
     if n
       _.first sorted, n
 
+  checkIDs: ->
+    $('[id]').each ->
+      ids = $('[id="' + this.id + '"]')
+      if (ids.length > 1 and ids[0] is this)
+        console.warn "Multiple IDs for ##{this.id}"
+
   # Logging helper
   # ---------------------
   _getPriority: (level) ->
