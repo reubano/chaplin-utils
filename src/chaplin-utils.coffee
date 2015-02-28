@@ -49,17 +49,17 @@ class ChapinUtils
   toggleOrderby: =>
     @mediator.setOrderby if @mediator.orderby is 'asc' then 'desc' else 'asc'
 
-  filterFeed: (feed, page) ->
-    if page?.filterby?.key and page?.filterby?.value
-      new Chaplin.Collection feed.filter (rfp) ->
-        rfp.get(page.filterby.key) is JSON.parse page.filterby.value
+  filterFeed: (collection, query) ->
+    if query?.filterby?.key and query?.filterby?.value
+      new Chaplin.Collection collection.filter (model) ->
+        model.get(query.filterby.key) is JSON.parse query.filterby.value
     else
-      feed
+      collection
 
-  makeFilterer: (filterby, tab, flip=null) ->
+  makeFilterer: (filterby, query, flip=null) ->
     (model) ->
-      if tab?.filterby?.key and tab?.filterby?.value
-        filter1 = model.get(tab.filterby.key) is tab.filterby.value
+      if query?.filterby?.key and query?.filterby?.value
+        filter1 = model.get(query.filterby.key) is query.filterby.value
       else
         filter1 = true
 
