@@ -56,7 +56,7 @@ class ChapinUtils
     else
       collection
 
-  makeFilterer: (filterby, query, flip=null) ->
+  makeFilterer: (filterby, query, flip) ->
     (model) ->
       if query?.filterby?.key and query?.filterby?.value
         filter1 = model.get(query.filterby.key) is query.filterby.value
@@ -72,12 +72,12 @@ class ChapinUtils
 
       filter1 and filter2
 
-  makeComparator: (sortby=null, orderby=null) =>
+  makeComparator: (sortby, orderby) =>
     sortby = sortby ? @mediator.sortby
     orderby = orderby ? @mediator.orderby
     (model) -> (if orderby is 'asc' then 1 else -1) * model.get sortby
 
-  getTags: (collection, options=null) ->
+  getTags: (collection, options) ->
     options = options ? {}
     attr = options?.attr ? 'k:tags'
     sortby = options?.sortby ? 'count'
@@ -119,7 +119,7 @@ class ChapinUtils
       when 'social' then 10
       else 0
 
-  log: (message, level='debug', options=null) =>
+  log: (message, level='debug', options) =>
     priority = @_getPriority level
     url = @mediator.url
     options = options ? {}
