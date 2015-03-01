@@ -1,8 +1,7 @@
-mediator = Chaplin.mediator
-
 class ChapinUtils
   constructor: (options) ->
     # required
+    @mediator = options.mediator
     @site = options.site
     @enable = options.enable
     @verbosity = options.verbosity
@@ -31,7 +30,6 @@ class ChapinUtils
     @log_interval = @time?.logger ? 5000
     @scroll_time = @time?.scroll ? 750
     @analytics = @google?.analytics
-    @subdomain = @site?.subdomain
     @google_analytics_id = "#{@analytics?.id}-#{@analytics?.site_number}"
 
   initGA: =>
@@ -48,20 +46,20 @@ class ChapinUtils
   smoothScroll: (postion) =>
     $('html, body').animate scrollTop: postion, @scroll_time, 'linear'
 
-  toggleOrderby: ->
-    mediator.setOrderby if mediator.orderby is 'asc' then 'desc' else 'asc'
+  toggleOrderby: =>
+    @mediator.setOrderby if @mediator.orderby is 'asc' then 'desc' else 'asc'
 
-  filterFeed: (feed, page) ->
-    if page?.filterby?.key and page?.filterby?.value
-      new Chaplin.Collection feed.filter (rfp) ->
-        rfp.get(page.filterby.key) is JSON.parse page.filterby.value
+  filterFeed: (collection, query) ->
+    if query?.filterby?.key and query?.filterby?.value
+      new Chaplin.Collection collection.filter (model) ->
+        model.get(query.filterby.key) is JSON.parse query.filterby.value
     else
-      feed
+      collection
 
-  makeFilterer: (filterby, tab, flip=null) ->
+  makeFilterer: (filterby, query, flip) ->
     (model) ->
-      if tab?.filterby?.key and tab?.filterby?.value
-        filter1 = model.get(tab.filterby.key) is tab.filterby.value
+      if query?.filterby?.key and query?.filterby?.value
+        filter1 = model.get(query.filterby.key) is query.filterby.value
       else
         filter1 = true
 
@@ -74,13 +72,35 @@ class ChapinUtils
 
       filter1 and filter2
 
-  makeComparator: (sortby=null, orderby=null) ->
-    sortby = sortby ? mediator.sortby
-    orderby = orderby ? mediator.orderby
+  makeComparator: (sortby, orderby) =>
+    sortby = sortby ? @mediator.sortby
+    orderby = orderby ? @mediator.orderby
     (model) -> (if orderby is 'asc' then 1 else -1) * model.get sortby
 
-  getTags: (collection) ->
-    _.uniq(_.flatten collection.pluck 'k:tags').sort()
+  getTags: (collection, options) ->
+    options = options ? {}
+    attr = options?.attr ? 'k:tags'
+    sortby = options?.sortby ? 'count'
+    n = options?.n ? false
+
+    all = _.flatten collection.pluck attr
+    # ['a', 'c', 'b', 'b', 'b', 'c']
+    counted = _.countBy all, (name) -> name
+    # {a: 1, c: 2, b: 3}
+    collected = ({name, count} for name, count of counted)
+    # [{name: 'a', count: 1}, {name: 'b', count: 3}, {name: 'c', count: 2}]
+    sorted = _.sortBy collected, 'name'
+
+    if sortby is 'count'
+      sorted = _.sortBy sorted, (name) -> - name.count
+
+    if n then _.first(sorted, parseInt n) else sorted
+
+  checkIDs: ->
+    $('[id]').each ->
+      ids = $('[id="' + this.id + '"]')
+      if (ids.length > 1 and ids[0] is this)
+        console.warn "Multiple IDs for ##{this.id}"
 
   # Logging helper
   # ---------------------
@@ -98,10 +118,9 @@ class ChapinUtils
       when 'social' then 10
       else 0
 
-  log: (message, level='debug', options=null) =>
+  log: (message, level='debug', options) =>
     priority = @_getPriority level
-    url = if @subdomain? then "/#{@subdomain}" else ''
-    url += mediator.url
+    url = @mediator.url
     options = options ? {}
 
     local_enabled = @enable.logger.local
@@ -124,12 +143,12 @@ class ChapinUtils
     if log_remote or track
       user_options =
         time: (new Date()).getTime()
-        user: mediator?.user?.get('email')
+        user: @mediator?.user?.get('email') ? @mediator?.user?.email
 
     if log_remote
       text = JSON.stringify message
       message = if text.length > 512 then "size exceeded" else message
-      data = _.extend {message: message}, user_options
+      data = _.extend {message}, user_options
       @logger[level] data
 
     if track
@@ -138,7 +157,7 @@ class ChapinUtils
           v: 1
           tid: @google_analytics_id
           cid: tracker.get 'clientId'
-          uid: mediator?.user?.get('id')
+          uid: @mediator?.user?.get('id') ? @mediator?.user?.id
           # uip: ip address
           dr: document.referrer or 'direct'
           ua: @ua
@@ -185,7 +204,7 @@ class ChapinUtils
             hit_options = _.extend hit_options,
               sn: options?.network ? 'facebook'
               sa: options?.action ? 'like'
-              st: options?.target ? mediator.url
+              st: options?.target ? url
 
         if level is 'experiment'
           hit_options = _.extend hit_options,
