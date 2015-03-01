@@ -56,7 +56,7 @@ class ChapinUtils
     else
       collection
 
-  makeFilterer: (filterby, query, flip) ->
+  makeFilterer: (filterby, query) ->
     (model) ->
       if query?.filterby?.key and query?.filterby?.value
         filter1 = model.get(query.filterby.key) is query.filterby.value
@@ -64,7 +64,7 @@ class ChapinUtils
         filter1 = true
 
       if filterby?.key and filterby?.value and filterby.key is 'tag'
-        filter2 = filterby.value in model.get 'k:tags'
+        filter2 = filterby.value in _.pluck(model.get('k:tags'), 'content')
       else if filterby?.key and filterby?.value
         filter2 = model.get(filterby.key) is filterby.value
       else
@@ -81,20 +81,25 @@ class ChapinUtils
     options = options ? {}
     attr = options?.attr ? 'k:tags'
     sortby = options?.sortby ? 'count'
-    n = options?.n ? false
+    orderby = if options?.orderby is 'asc' then 1 else -1
+    token = options?.token
+    n = options?.n
 
-    all = _.flatten collection.pluck attr
+    flattened = _.flatten collection.pluck attr
+    # ['a', 'c', 'b', 'b', 'b', 'c'] or if tokenized
+    # [{token: 'a'}, {token: 'c'}, {token: 'b'}, {token: 'b'}, {token: 'b'}]
+    all = if token then _.pluck(flattened, token) else flattened
     # ['a', 'c', 'b', 'b', 'b', 'c']
     counted = _.countBy all, (name) -> name
     # {a: 1, c: 2, b: 3}
     collected = ({name, count} for name, count of counted)
+    # [{name: 'a', count: 1}, {name: 'c', count: 2}, {name: 'b', count: 3}]
+    cleaned = _.reject(collected, (tag) -> tag.name is 'undefined')
+    presorted = _.sortBy cleaned, 'name'
     # [{name: 'a', count: 1}, {name: 'b', count: 3}, {name: 'c', count: 2}]
-    sorted = _.sortBy collected, 'name'
-
-    if sortby is 'count'
-      sorted = _.sortBy sorted, (name) -> - name.count
-
-    if n then _.first(sorted, parseInt n) else sorted
+    sorted = _.sortBy(presorted, (name) -> orderby * name[sortby])
+    # [{name: 'b', count: 3}, {name: 'c', count: 2}, {name: 'a', count: 1}]
+    if n then _.first(sorted, n) else sorted
 
   checkIDs: ->
     $('[id]').each ->
