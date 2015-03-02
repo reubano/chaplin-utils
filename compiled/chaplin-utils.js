@@ -80,19 +80,24 @@
       }
     };
 
-    ChapinUtils.prototype.makeFilterer = function(filterby, query, flip) {
+    ChapinUtils.prototype.makeFilterer = function(filterby, query, token) {
       return function(model) {
-        var filter1, filter2, _ref, _ref1, _ref2;
+        var filter1, filter2, model_slugs, model_value, model_values, _ref, _ref1, _ref2;
 
         if ((query != null ? (_ref = query.filterby) != null ? _ref.key : void 0 : void 0) && (query != null ? (_ref1 = query.filterby) != null ? _ref1.value : void 0 : void 0)) {
           filter1 = model.get(query.filterby.key) === query.filterby.value;
         } else {
           filter1 = true;
         }
-        if ((filterby != null ? filterby.key : void 0) && (filterby != null ? filterby.value : void 0) && filterby.key === 'tag') {
-          filter2 = (_ref2 = filterby.value, __indexOf.call(model.get('k:tags'), _ref2) >= 0);
+        if ((filterby != null ? filterby.key : void 0) && (filterby != null ? filterby.value : void 0) && token) {
+          model_values = _.pluck(model.get(filterby.key), token);
+          model_slugs = _(model_values).map(function(value) {
+            return s.slugify(value);
+          });
+          filter2 = (_ref2 = filterby.value, __indexOf.call(model_slugs, _ref2) >= 0);
         } else if ((filterby != null ? filterby.key : void 0) && (filterby != null ? filterby.value : void 0)) {
-          filter2 = model.get(filterby.key) === filterby.value;
+          model_value = model.get(filterby.key);
+          filter2 = s.slugify(model_value) === filterby.value;
         } else {
           filter2 = true;
         }
@@ -109,13 +114,16 @@
     };
 
     ChapinUtils.prototype.getTags = function(collection, options) {
-      var all, attr, collected, count, counted, n, name, sortby, sorted, _ref, _ref1, _ref2;
+      var all, attr, cleaned, collected, count, counted, flattened, n, name, orderby, presorted, sortby, sorted, token, _ref, _ref1;
 
       options = options != null ? options : {};
       attr = (_ref = options != null ? options.attr : void 0) != null ? _ref : 'k:tags';
       sortby = (_ref1 = options != null ? options.sortby : void 0) != null ? _ref1 : 'count';
-      n = (_ref2 = options != null ? options.n : void 0) != null ? _ref2 : false;
-      all = _.flatten(collection.pluck(attr));
+      orderby = (options != null ? options.orderby : void 0) === 'asc' ? 1 : -1;
+      token = options != null ? options.token : void 0;
+      n = options != null ? options.n : void 0;
+      flattened = _.flatten(collection.pluck(attr));
+      all = token ? _.pluck(flattened, token) : flattened;
       counted = _.countBy(all, function(name) {
         return name;
       });
@@ -132,14 +140,15 @@
         }
         return _results;
       })();
-      sorted = _.sortBy(collected, 'name');
-      if (sortby === 'count') {
-        sorted = _.sortBy(sorted, function(name) {
-          return -name.count;
-        });
-      }
+      cleaned = _.reject(collected, function(tag) {
+        return tag.name === 'undefined';
+      });
+      presorted = _.sortBy(cleaned, 'name');
+      sorted = _.sortBy(presorted, function(name) {
+        return orderby * name[sortby];
+      });
       if (n) {
-        return _.first(sorted, parseInt(n));
+        return _.first(sorted, n);
       } else {
         return sorted;
       }
