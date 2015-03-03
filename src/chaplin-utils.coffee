@@ -46,9 +46,6 @@ class ChapinUtils
   smoothScroll: (postion) =>
     $('html, body').animate scrollTop: postion, @scroll_time, 'linear'
 
-  toggleOrderby: =>
-    @mediator.setOrderby if @mediator.orderby is 'asc' then 'desc' else 'asc'
-
   filterFeed: (collection, query) ->
     if query?.filterby?.key and query?.filterby?.value
       new Chaplin.Collection collection.filter (model) ->
@@ -76,8 +73,6 @@ class ChapinUtils
       filter1 and filter2
 
   makeComparator: (sortby, orderby) =>
-    sortby = sortby ? @mediator.sortby
-    orderby = orderby ? @mediator.orderby
     (model) -> (if orderby is 'asc' then 1 else -1) * model.get sortby
 
   getTags: (collection, options) ->
