@@ -77,6 +77,7 @@ class ChapinUtils
     (model) -> (if orderby is 'asc' then 1 else -1) * model.get sortby
 
   getTags: (collection, options) ->
+    return [] unless collection.length > 0
     options = options ? {}
     attr = options?.attr ? 'k:tags'
     sortby = options?.sortby ? 'count'
