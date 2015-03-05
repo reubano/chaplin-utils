@@ -41,13 +41,11 @@ class ChapinUtils
     ga 'create', @google_analytics_id, cookie_domain
     ga 'require', 'displayfeatures'
 
-  changeURL: (url) -> Backbone.history.navigate url, trigger: false
+  changeURL: (params, pageId) ->
+    Backbone.history.navigate "#{pageId}?#{$.param(params)}", trigger: false
 
   smoothScroll: (postion) =>
     $('html, body').animate scrollTop: postion, @scroll_time, 'linear'
-
-  toggleOrderby: =>
-    @mediator.setOrderby if @mediator.orderby is 'asc' then 'desc' else 'asc'
 
   filterFeed: (collection, query) ->
     if query?.filterby?.key and query?.filterby?.value
@@ -76,11 +74,10 @@ class ChapinUtils
       filter1 and filter2
 
   makeComparator: (sortby, orderby) =>
-    sortby = sortby ? @mediator.sortby
-    orderby = orderby ? @mediator.orderby
     (model) -> (if orderby is 'asc' then 1 else -1) * model.get sortby
 
   getTags: (collection, options) ->
+    return [] unless collection.length > 0
     options = options ? {}
     attr = options?.attr ? 'k:tags'
     sortby = options?.sortby ? 'count'
