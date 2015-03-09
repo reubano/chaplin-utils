@@ -54,15 +54,15 @@ class ChapinUtils
     else
       collection
 
-  makeFilterer: (filterby, query, token) ->
+  makeFilterer: (filterby, query) ->
     (model) ->
       if query?.filterby?.key and query?.filterby?.value
         filter1 = model.get(query.filterby.key) is query.filterby.value
       else
         filter1 = true
 
-      if filterby?.key and filterby?.value and token
-        model_values = _.pluck(model.get(filterby.key), token)
+      if filterby?.key and filterby?.value and filterby?.token
+        model_values = _.pluck(model.get(filterby.key), filterby.token)
       else if filterby?.key and filterby?.value
         model_values = model.get(filterby.key)
       else
