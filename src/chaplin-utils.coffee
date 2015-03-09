@@ -47,7 +47,7 @@ class ChapinUtils
   smoothScroll: (postion) =>
     $('html, body').animate scrollTop: postion, @scroll_time, 'linear'
 
-  filterFeed: (collection, query) ->
+  filterCollection: (collection, query) ->
     if query?.filterby?.key and query?.filterby?.value
       new Chaplin.Collection collection.filter (model) ->
         model.get(query.filterby.key) is JSON.parse query.filterby.value
