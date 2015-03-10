@@ -8,7 +8,6 @@
     function ChapinUtils(options) {
       this.log = __bind(this.log, this);
       this.makeComparator = __bind(this.makeComparator, this);
-      this.toggleOrderby = __bind(this.toggleOrderby, this);
       this.smoothScroll = __bind(this.smoothScroll, this);
       this.initGA = __bind(this.initGA, this);
       this.init = __bind(this.init, this);      this.mediator = options.mediator;
@@ -52,8 +51,8 @@
       return ga('require', 'displayfeatures');
     };
 
-    ChapinUtils.prototype.changeURL = function(url) {
-      return Backbone.history.navigate(url, {
+    ChapinUtils.prototype.changeURL = function(params, pageId) {
+      return Backbone.history.navigate("" + pageId + "?" + ($.param(params)), {
         trigger: false
       });
     };
@@ -62,10 +61,6 @@
       return $('html, body').animate({
         scrollTop: postion
       }, this.scroll_time, 'linear');
-    };
-
-    ChapinUtils.prototype.toggleOrderby = function() {
-      return this.mediator.setOrderby(this.mediator.orderby === 'asc' ? 'desc' : 'asc');
     };
 
     ChapinUtils.prototype.filterFeed = function(collection, query) {
@@ -82,7 +77,7 @@
 
     ChapinUtils.prototype.makeFilterer = function(filterby, query, token) {
       return function(model) {
-        var filter1, filter2, model_slugs, model_value, model_values, _ref, _ref1, _ref2;
+        var filter1, filter2, model_slugs, model_values, _ref, _ref1, _ref2;
 
         if ((query != null ? (_ref = query.filterby) != null ? _ref.key : void 0 : void 0) && (query != null ? (_ref1 = query.filterby) != null ? _ref1.value : void 0 : void 0)) {
           filter1 = model.get(query.filterby.key) === query.filterby.value;
@@ -91,23 +86,24 @@
         }
         if ((filterby != null ? filterby.key : void 0) && (filterby != null ? filterby.value : void 0) && token) {
           model_values = _.pluck(model.get(filterby.key), token);
+        } else if ((filterby != null ? filterby.key : void 0) && (filterby != null ? filterby.value : void 0)) {
+          model_values = model.get(filterby.key);
+        } else {
+          filter2 = true;
+        }
+        if ((model_values != null) && _.isArray(model_values)) {
           model_slugs = _(model_values).map(function(value) {
             return s.slugify(value);
           });
           filter2 = (_ref2 = filterby.value, __indexOf.call(model_slugs, _ref2) >= 0);
-        } else if ((filterby != null ? filterby.key : void 0) && (filterby != null ? filterby.value : void 0)) {
-          model_value = model.get(filterby.key);
-          filter2 = s.slugify(model_value) === filterby.value;
-        } else {
-          filter2 = true;
+        } else if (model_values != null) {
+          filter2 = filterby.value === s.slugify(model_values);
         }
         return filter1 && filter2;
       };
     };
 
     ChapinUtils.prototype.makeComparator = function(sortby, orderby) {
-      sortby = sortby != null ? sortby : this.mediator.sortby;
-      orderby = orderby != null ? orderby : this.mediator.orderby;
       return function(model) {
         return (orderby === 'asc' ? 1 : -1) * model.get(sortby);
       };
@@ -116,6 +112,9 @@
     ChapinUtils.prototype.getTags = function(collection, options) {
       var all, attr, cleaned, collected, count, counted, flattened, n, name, orderby, presorted, sortby, sorted, token, _ref, _ref1;
 
+      if (!(collection.length > 0)) {
+        return [];
+      }
       options = options != null ? options : {};
       attr = (_ref = options != null ? options.attr : void 0) != null ? _ref : 'k:tags';
       sortby = (_ref1 = options != null ? options.sortby : void 0) != null ? _ref1 : 'count';
@@ -125,7 +124,7 @@
       flattened = _.flatten(collection.pluck(attr));
       all = token ? _.pluck(flattened, token) : flattened;
       counted = _.countBy(all, function(name) {
-        return name;
+        return name != null ? name.toLowerCase() : void 0;
       });
       collected = (function() {
         var _results;
@@ -141,7 +140,9 @@
         return _results;
       })();
       cleaned = _.reject(collected, function(tag) {
-        return tag.name === 'undefined';
+        var _ref2;
+
+        return (_ref2 = tag.name) === '' || _ref2 === 'undefined';
       });
       presorted = _.sortBy(cleaned, 'name');
       sorted = _.sortBy(presorted, function(name) {
