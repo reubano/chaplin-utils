@@ -63,13 +63,16 @@ class ChapinUtils
 
       if filterby?.key and filterby?.value and token
         model_values = _.pluck(model.get(filterby.key), token)
-        model_slugs = _(model_values).map((value) -> s.slugify value)
-        filter2 = filterby.value in model_slugs
       else if filterby?.key and filterby?.value
-        model_value = model.get(filterby.key)
-        filter2 = s.slugify(model_value) is filterby.value
+        model_values = model.get(filterby.key)
       else
         filter2 = true
+
+      if model_values? and _.isArray(model_values)
+        model_slugs = _(model_values).map((value) -> s.slugify value)
+        filter2 = filterby.value in model_slugs
+      else if model_values?
+        filter2 = filterby.value is s.slugify(model_values)
 
       filter1 and filter2
 
