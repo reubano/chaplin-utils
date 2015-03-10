@@ -63,7 +63,7 @@
       }, this.scroll_time, 'linear');
     };
 
-    ChapinUtils.prototype.filterFeed = function(collection, query) {
+    ChapinUtils.prototype.filterCollection = function(collection, query) {
       var _ref, _ref1;
 
       if ((query != null ? (_ref = query.filterby) != null ? _ref.key : void 0 : void 0) && (query != null ? (_ref1 = query.filterby) != null ? _ref1.value : void 0 : void 0)) {
@@ -75,7 +75,7 @@
       }
     };
 
-    ChapinUtils.prototype.makeFilterer = function(filterby, query, token) {
+    ChapinUtils.prototype.makeFilterer = function(filterby, query) {
       return function(model) {
         var filter1, filter2, model_slugs, model_values, _ref, _ref1, _ref2;
 
@@ -84,8 +84,8 @@
         } else {
           filter1 = true;
         }
-        if ((filterby != null ? filterby.key : void 0) && (filterby != null ? filterby.value : void 0) && token) {
-          model_values = _.pluck(model.get(filterby.key), token);
+        if ((filterby != null ? filterby.key : void 0) && (filterby != null ? filterby.value : void 0) && (filterby != null ? filterby.token : void 0)) {
+          model_values = _.pluck(model.get(filterby.key), filterby.token);
         } else if ((filterby != null ? filterby.key : void 0) && (filterby != null ? filterby.value : void 0)) {
           model_values = model.get(filterby.key);
         } else {
@@ -110,7 +110,7 @@
     };
 
     ChapinUtils.prototype.getTags = function(collection, options) {
-      var all, attr, cleaned, collected, count, counted, flattened, n, name, orderby, presorted, sortby, sorted, token, _ref, _ref1;
+      var all, attr, cleaned, collected, count, counted, flattened, n, name, orderby, presorted, sortby, sorted, start, token, _ref, _ref1;
 
       if (!(collection.length > 0)) {
         return [];
@@ -121,6 +121,7 @@
       orderby = (options != null ? options.orderby : void 0) === 'asc' ? 1 : -1;
       token = options != null ? options.token : void 0;
       n = options != null ? options.n : void 0;
+      start = options != null ? options.start : void 0;
       flattened = _.flatten(collection.pluck(attr));
       all = token ? _.pluck(flattened, token) : flattened;
       counted = _.countBy(all, function(name) {
@@ -148,8 +149,12 @@
       sorted = _.sortBy(presorted, function(name) {
         return orderby * name[sortby];
       });
-      if (n) {
+      if (start && n) {
+        return _.first(_(sorted).rest(start), n);
+      } else if (n) {
         return _.first(sorted, n);
+      } else if (start) {
+        return _.rest(sorted, start);
       } else {
         return sorted;
       }
