@@ -93,7 +93,7 @@ class ChapinUtils
     # [{token: 'a'}, {token: 'c'}, {token: 'b'}, {token: 'b'}, {token: 'b'}]
     all = if token then _.pluck(flattened, token) else flattened
     # ['a', 'c', 'b', 'b', 'b', 'c']
-    counted = _.countBy all, (name) -> name
+    counted = _.countBy all, (name) -> name?.toLowerCase()
     # {a: 1, c: 2, b: 3}
     collected = ({name, count} for name, count of counted)
     # [{name: 'a', count: 1}, {name: 'c', count: 2}, {name: 'b', count: 3}]
