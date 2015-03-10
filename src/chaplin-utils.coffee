@@ -63,13 +63,16 @@ class ChapinUtils
 
       if filterby?.key and filterby?.value and token
         model_values = _.pluck(model.get(filterby.key), token)
-        model_slugs = _(model_values).map((value) -> s.slugify value)
-        filter2 = filterby.value in model_slugs
       else if filterby?.key and filterby?.value
-        model_value = model.get(filterby.key)
-        filter2 = s.slugify(model_value) is filterby.value
+        model_values = model.get(filterby.key)
       else
         filter2 = true
+
+      if model_values? and _.isArray(model_values)
+        model_slugs = _(model_values).map((value) -> s.slugify value)
+        filter2 = filterby.value in model_slugs
+      else if model_values?
+        filter2 = filterby.value is s.slugify(model_values)
 
       filter1 and filter2
 
@@ -90,11 +93,11 @@ class ChapinUtils
     # [{token: 'a'}, {token: 'c'}, {token: 'b'}, {token: 'b'}, {token: 'b'}]
     all = if token then _.pluck(flattened, token) else flattened
     # ['a', 'c', 'b', 'b', 'b', 'c']
-    counted = _.countBy all, (name) -> name
+    counted = _.countBy all, (name) -> name?.toLowerCase()
     # {a: 1, c: 2, b: 3}
     collected = ({name, count} for name, count of counted)
     # [{name: 'a', count: 1}, {name: 'c', count: 2}, {name: 'b', count: 3}]
-    cleaned = _.reject(collected, (tag) -> tag.name is 'undefined')
+    cleaned = _.reject collected, (tag) -> tag.name in ['', 'undefined']
     presorted = _.sortBy cleaned, 'name'
     # [{name: 'a', count: 1}, {name: 'b', count: 3}, {name: 'c', count: 2}]
     sorted = _.sortBy(presorted, (name) -> orderby * name[sortby])
