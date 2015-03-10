@@ -87,6 +87,7 @@ class ChapinUtils
     orderby = if options?.orderby is 'asc' then 1 else -1
     token = options?.token
     n = options?.n
+    start = options?.start
 
     flattened = _.flatten collection.pluck attr
     # ['a', 'c', 'b', 'b', 'b', 'c'] or if tokenized
@@ -102,7 +103,15 @@ class ChapinUtils
     # [{name: 'a', count: 1}, {name: 'b', count: 3}, {name: 'c', count: 2}]
     sorted = _.sortBy(presorted, (name) -> orderby * name[sortby])
     # [{name: 'b', count: 3}, {name: 'c', count: 2}, {name: 'a', count: 1}]
-    if n then _.first(sorted, n) else sorted
+
+    if start and n
+      _.first _(sorted).rest(start), n
+    else if n
+      _.first sorted, n
+    else if start
+      _.rest sorted, start
+    else
+      sorted
 
   checkIDs: ->
     $('[id]').each ->
