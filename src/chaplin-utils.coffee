@@ -97,7 +97,7 @@ class ChapinUtils
     # {a: 1, c: 2, b: 3}
     collected = ({name, count} for name, count of counted)
     # [{name: 'a', count: 1}, {name: 'c', count: 2}, {name: 'b', count: 3}]
-    cleaned = _.reject(collected, (tag) -> tag.name is 'undefined')
+    cleaned = _.reject collected, (tag) -> tag.name in ['', 'undefined']
     presorted = _.sortBy cleaned, 'name'
     # [{name: 'a', count: 1}, {name: 'b', count: 3}, {name: 'c', count: 2}]
     sorted = _.sortBy(presorted, (name) -> orderby * name[sortby])
