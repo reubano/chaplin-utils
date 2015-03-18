@@ -51,8 +51,14 @@
       return ga('require', 'displayfeatures');
     };
 
-    ChapinUtils.prototype.changeURL = function(params, pageId) {
-      return Backbone.history.navigate("" + pageId + "?" + ($.param(params)), {
+    ChapinUtils.prototype.changeURL = function(pageId, params) {
+      var url;
+
+      if (params == null) {
+        params = null;
+      }
+      url = params != null ? "" + pageId + "?" + ($.param(params)) : pageId;
+      return Backbone.history.navigate(url, {
         trigger: false
       });
     };
