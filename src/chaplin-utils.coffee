@@ -41,8 +41,9 @@ class ChapinUtils
     ga 'create', @google_analytics_id, cookie_domain
     ga 'require', 'displayfeatures'
 
-  changeURL: (params, pageId) ->
-    Backbone.history.navigate "#{pageId}?#{$.param(params)}", trigger: false
+  changeURL: (pageId, params=null) ->
+    url = if params? then "#{pageId}?#{$.param(params)}" else pageId
+    Backbone.history.navigate url, trigger: false
 
   smoothScroll: (postion) =>
     $('html, body').animate scrollTop: postion, @scroll_time, 'linear'
