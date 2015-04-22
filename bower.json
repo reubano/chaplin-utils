@@ -10,7 +10,7 @@
     "chaplin": "~1.0.0",
     "minilog": "~2.0.6",
     "jquery": "~2.0.2",
-    "lodash": "~2.4.0",
+    "lodash": "~3.7.0",
     "underscore.string": "~3.0.3",
     "google-analytics": "http://www.google-analytics.com/analytics.js"
   },
