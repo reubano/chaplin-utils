@@ -116,7 +116,7 @@
     };
 
     ChapinUtils.prototype.getTags = function(collection, options) {
-      var all, attr, cleaned, collected, count, counted, flattened, n, name, orderby, presorted, sortby, sorted, start, token, _ref, _ref1;
+      var all, attr, cleaned, collected, count, counts, flattened, n, name, orderby, presorted, sortby, sorted, start, token, _ref, _ref1;
 
       if (!(collection.length > 0)) {
         return [];
@@ -130,17 +130,18 @@
       start = options != null ? options.start : void 0;
       flattened = _.flatten(collection.pluck(attr));
       all = token ? _.pluck(flattened, token) : flattened;
-      counted = _.countBy(all, function(name) {
+      counts = _.countBy(all, function(name) {
         return name != null ? name.toLowerCase() : void 0;
       });
       collected = (function() {
         var _results;
 
         _results = [];
-        for (name in counted) {
-          count = counted[name];
+        for (name in counts) {
+          count = counts[name];
           _results.push({
             name: name,
+            slug: s.slugify(name),
             count: count
           });
         }
