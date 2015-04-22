@@ -83,12 +83,12 @@ class ChapinUtils
   getTags: (collection, options) ->
     return [] unless collection.length > 0
     options = options ? {}
-    attr = options?.attr ? 'k:tags'
-    sortby = options?.sortby ? 'count'
-    orderby = if options?.orderby is 'asc' then 1 else -1
-    token = options?.token
-    n = options?.n
-    start = options?.start
+    attr = options.attr ? 'k:tags'
+    sortby = options.sortby ? 'count'
+    orderby = if options.orderby is 'asc' then 1 else -1
+    token = options.token
+    n = options.n
+    start = options.start ? 0
 
     flattened = _.flatten collection.pluck attr
     # ['a', 'c', 'B', 'b', 'b b', 'c'] or if tokenized
@@ -120,14 +120,7 @@ class ChapinUtils
     #   {name: 'c', slug: 'c', count: 1},
     # ]
 
-    if start and n
-      _.first _(sorted).rest(start), n
-    else if n
-      _.first sorted, n
-    else if start
-      _.rest sorted, start
-    else
-      sorted
+    if n then sorted[start...start + n] else sorted[start..]
 
   checkIDs: ->
     $('[id]').each ->

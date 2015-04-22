@@ -116,18 +116,18 @@
     };
 
     ChapinUtils.prototype.getTags = function(collection, options) {
-      var all, attr, cleaned, collected, count, counts, flattened, n, name, orderby, presorted, sortby, sorted, start, token, _ref, _ref1;
+      var all, attr, cleaned, collected, count, counts, flattened, n, name, orderby, presorted, sortby, sorted, start, token, _ref, _ref1, _ref2;
 
       if (!(collection.length > 0)) {
         return [];
       }
       options = options != null ? options : {};
-      attr = (_ref = options != null ? options.attr : void 0) != null ? _ref : 'k:tags';
-      sortby = (_ref1 = options != null ? options.sortby : void 0) != null ? _ref1 : 'count';
-      orderby = (options != null ? options.orderby : void 0) === 'asc' ? 1 : -1;
-      token = options != null ? options.token : void 0;
-      n = options != null ? options.n : void 0;
-      start = options != null ? options.start : void 0;
+      attr = (_ref = options.attr) != null ? _ref : 'k:tags';
+      sortby = (_ref1 = options.sortby) != null ? _ref1 : 'count';
+      orderby = options.orderby === 'asc' ? 1 : -1;
+      token = options.token;
+      n = options.n;
+      start = (_ref2 = options.start) != null ? _ref2 : 0;
       flattened = _.flatten(collection.pluck(attr));
       all = token ? _.pluck(flattened, token) : flattened;
       counts = _.countBy(all, function(name) {
@@ -148,22 +148,18 @@
         return _results;
       })();
       cleaned = _.reject(collected, function(tag) {
-        var _ref2;
+        var _ref3;
 
-        return (_ref2 = tag.name) === '' || _ref2 === 'undefined';
+        return (_ref3 = tag.name) === '' || _ref3 === 'undefined';
       });
       presorted = _.sortBy(cleaned, 'name');
       sorted = _.sortBy(presorted, function(name) {
         return orderby * name[sortby];
       });
-      if (start && n) {
-        return _.first(_(sorted).rest(start), n);
-      } else if (n) {
-        return _.first(sorted, n);
-      } else if (start) {
-        return _.rest(sorted, start);
+      if (n) {
+        return sorted.slice(start, start + n);
       } else {
-        return sorted;
+        return sorted.slice(start);
       }
     };
 
