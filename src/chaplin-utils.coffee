@@ -91,19 +91,34 @@ class ChapinUtils
     start = options?.start
 
     flattened = _.flatten collection.pluck attr
-    # ['a', 'c', 'b', 'b', 'b', 'c'] or if tokenized
-    # [{token: 'a'}, {token: 'c'}, {token: 'b'}, {token: 'b'}, {token: 'b'}]
+    # ['a', 'c', 'B', 'b', 'b b', 'c'] or if tokenized
+    # [{token: 'a'}, {token: 'c'}, {token: 'B'}, {token: 'b'}, {token: 'b b'}]
     all = if token then _.pluck(flattened, token) else flattened
-    # ['a', 'c', 'b', 'b', 'b', 'c']
-    counted = _.countBy all, (name) -> name?.toLowerCase()
-    # {a: 1, c: 2, b: 3}
-    collected = ({name, count} for name, count of counted)
-    # [{name: 'a', count: 1}, {name: 'c', count: 2}, {name: 'b', count: 3}]
+    # ['a', 'c', 'B', 'b', 'b b', 'c']
+    counts = _.countBy all, (name) -> name?.toLowerCase()
+    # {a: 1, c: 2, b: 2, b b: 1}
+    collected = ({name, slug: s.slugify(name), count} for name, count of counts)
+    # [
+    #   {name: 'a', slug: 'a', count: 1},
+    #   {name: 'c', slug: 'c', count: 2},
+    #   {name: 'b', slug: 'b', count: 2},
+    #   {name: 'b b', slug: 'b-b', count: 1},
+    # ]
     cleaned = _.reject collected, (tag) -> tag.name in ['', 'undefined']
     presorted = _.sortBy cleaned, 'name'
-    # [{name: 'a', count: 1}, {name: 'b', count: 3}, {name: 'c', count: 2}]
+    # [
+    #   {name: 'a', slug: 'a', count: 1},
+    #   {name: 'b', slug: 'b', count: 2},
+    #   {name: 'b b', slug: 'b-b', count: 2},
+    #   {name: 'c', slug: 'c', count: 1},
+    # ]
     sorted = _.sortBy(presorted, (name) -> orderby * name[sortby])
-    # [{name: 'b', count: 3}, {name: 'c', count: 2}, {name: 'a', count: 1}]
+    # [
+    #   {name: 'b', slug: 'b', count: 2},
+    #   {name: 'b b', slug: 'b-b', count: 2},
+    #   {name: 'a', slug: 'a', count: 1},
+    #   {name: 'c', slug: 'c', count: 1},
+    # ]
 
     if start and n
       _.first _(sorted).rest(start), n
