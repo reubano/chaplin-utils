@@ -85,24 +85,25 @@
       return function(model) {
         var filter1, filter2, model_slugs, model_values, _ref, _ref1, _ref2;
 
-        if ((query != null ? (_ref = query.filterby) != null ? _ref.key : void 0 : void 0) && (query != null ? (_ref1 = query.filterby) != null ? _ref1.value : void 0 : void 0)) {
+        if (query && ((_ref = query.filterby) != null ? _ref.key : void 0) && ((_ref1 = query.filterby) != null ? _ref1.value : void 0)) {
           filter1 = model.get(query.filterby.key) === query.filterby.value;
         } else {
           filter1 = true;
         }
-        if ((filterby != null ? filterby.key : void 0) && (filterby != null ? filterby.value : void 0) && (filterby != null ? filterby.token : void 0)) {
-          model_values = _.pluck(model.get(filterby.key), filterby.token);
-        } else if ((filterby != null ? filterby.key : void 0) && (filterby != null ? filterby.value : void 0)) {
-          model_values = model.get(filterby.key);
-        } else {
-          filter2 = true;
+        if (!((filterby != null ? filterby.key : void 0) && (filterby != null ? filterby.value : void 0))) {
+          return filter1;
         }
-        if ((model_values != null) && _.isArray(model_values)) {
-          model_slugs = _(model_values).map(function(value) {
+        if (filterby != null ? filterby.token : void 0) {
+          model_values = _.pluck(model.get(filterby.key), filterby.token);
+        } else {
+          model_values = model.get(filterby.key);
+        }
+        if (_.isArray(model_values)) {
+          model_slugs = _.map(model_values, function(value) {
             return s.slugify(value);
           });
           filter2 = (_ref2 = filterby.value, __indexOf.call(model_slugs, _ref2) >= 0);
-        } else if (model_values != null) {
+        } else {
           filter2 = filterby.value === s.slugify(model_values);
         }
         return filter1 && filter2;
