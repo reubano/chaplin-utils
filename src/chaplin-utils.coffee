@@ -57,7 +57,7 @@ class ChapinUtils
 
   makeFilterer: (filterby, query) ->
     (model) ->
-      if query?.filterby?.key and query?.filterby?.value
+      if query and query.filterby?.key and query.filterby?.value
         filter1 = model.get(query.filterby.key) is query.filterby.value
       else
         filter1 = true
@@ -119,7 +119,6 @@ class ChapinUtils
     #   {name: 'a', slug: 'a', count: 1},
     #   {name: 'c', slug: 'c', count: 1},
     # ]
-
     if n then sorted[start...start + n] else sorted[start..]
 
   checkIDs: ->
