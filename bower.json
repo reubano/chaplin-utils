@@ -7,7 +7,6 @@
   "description": "Useful utilities for chaplinjs apps",
   "main": "compiled/chaplin-utils.js",
   "dependencies": {
-    "chaplin": "~1.0.0",
     "minilog": "~2.0.6",
     "jquery": "~2.0.2",
     "lodash": "~3.7.0",
