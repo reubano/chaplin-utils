@@ -1,13 +1,12 @@
 {
   "name": "chaplin-utils",
-  "version": "0.14.1",
+  "version": "0.14.2",
   "authors": [
     "Reuben Cummings <reubano@gmail.com>"
   ],
   "description": "Useful utilities for chaplinjs apps",
   "main": "compiled/chaplin-utils.js",
   "dependencies": {
-    "chaplin": "~1.0.0",
     "minilog": "~2.0.6",
     "jquery": "~2.0.2",
     "lodash": "~3.7.0",

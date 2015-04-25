@@ -57,22 +57,22 @@ class ChapinUtils
 
   makeFilterer: (filterby, query) ->
     (model) ->
-      if query?.filterby?.key and query?.filterby?.value
+      if query and query.filterby?.key and query.filterby?.value
         filter1 = model.get(query.filterby.key) is query.filterby.value
       else
         filter1 = true
 
-      if filterby?.key and filterby?.value and filterby?.token
-        model_values = _.pluck(model.get(filterby.key), filterby.token)
-      else if filterby?.key and filterby?.value
-        model_values = model.get(filterby.key)
-      else
-        filter2 = true
+      return filter1 unless filterby?.key and filterby?.value
 
-      if model_values? and _.isArray(model_values)
-        model_slugs = _(model_values).map((value) -> s.slugify value)
+      if filterby?.token
+        model_values = _.pluck(model.get(filterby.key), filterby.token)
+      else
+        model_values = model.get(filterby.key)
+
+      if _.isArray(model_values)
+        model_slugs = _.map(model_values, (value) -> s.slugify value)
         filter2 = filterby.value in model_slugs
-      else if model_values?
+      else
         filter2 = filterby.value is s.slugify(model_values)
 
       filter1 and filter2
@@ -119,7 +119,6 @@ class ChapinUtils
     #   {name: 'a', slug: 'a', count: 1},
     #   {name: 'c', slug: 'c', count: 1},
     # ]
-
     if n then sorted[start...start + n] else sorted[start..]
 
   checkIDs: ->
